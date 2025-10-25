@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dowry Calculator — যৌতুক (joutuk)</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --accent:#0b63d6;
+      --muted:#6b7280;
+      --danger:#c0392b;
+      --maxw:720px;
+      --radius:12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+                   Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg, #eef6ff 0%, var(--bg) 100%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+      color:#111827;
+    }
+
+    .card{
+      width:100%;
+      max-width:var(--maxw);
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:0 10px 30px rgba(2,6,23,0.08);
+      padding:28px;
+      transition:all .45s ease;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:10px;
+      background:linear-gradient(135deg,var(--accent),#0b9bf0);
+      color:white;display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:18px;
+      box-shadow:0 6px 18px rgba(11,99,214,0.18);
+    }
+    h1{margin:0;font-size:20px}
+    p.lead{margin:6px 0 18px;color:var(--muted);font-size:14px}
+
+    form .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    select,input[type="text"],input[type="number"]{
+      width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6e9ef;
+      background:#fff;font-size:14px;
+    }
+
+    .full{grid-column:1/-1}
+    .actions{display:flex;gap:10px;align-items:center;margin-top:14px}
+    button{
+      background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:10px;
+      font-weight:600;cursor:pointer;
+      box-shadow:0 8px 18px rgba(11,99,214,0.12);
+    }
+    button.ghost{background:transparent;color:var(--accent);border:1px solid #dbe9ff;box-shadow:none}
+
+    .foot{margin-top:14px;color:var(--muted);font-size:13px}
+
+    /* result overlay */
+    .result{
+      display:none;
+      margin-top:18px;
+      background:linear-gradient(90deg,#fff 0%,#fcfcff 100%);
+      border-radius:10px;padding:18px;border:1px solid #eef2ff;
+    }
+    .big-number{font-size:40px;font-weight:800;color:var(--danger);line-height:1}
+    .message{margin-top:10px;color:#111827;font-weight:600}
+
+    /* final transformed note */
+    .final-note{
+      display:none;
+      padding:28px;border-radius:12px;text-align:center;
+      background:linear-gradient(180deg,#fff 0%, #fff9f9 100%);border:1px solid #ffecec;
+    }
+    .final-note h2{margin:0;font-size:22px;color:#111827}
+    .final-note p{color:var(--muted);margin:12px 0 18px;font-size:15px}
+    .cta{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--danger);color:#fff;font-weight:700;text-decoration:none}
+
+    footer{margin-top:16px;font-size:12px;color:var(--muted)}
+    .source{color:#3b82f6;text-decoration:none;font-weight:600}
+    @media (max-width:640px){
+      .grid{grid-template-columns:1fr}
+      header{gap:10px}
+      .logo{width:48px;height:48px}
+      .big-number{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+  <main class="card" id="app">
+    <header>
+      <div class="logo">যৌ</div>
+      <div>
+        <h1>Dowry Calculator — যৌতুক (joutuk)</h1>
+        <p class="lead">Fill the details below. This is an awareness tool — not a real pricing calculator.</p>
+      </div>
+    </header>
+
+    <form id="calcForm" aria-label="Dowry awareness form">
+      <div class="grid">
+        <div>
+          <label for="age">Age</label>
+          <select id="age" required>
+            <option value="">Select</option>
+            <option>18-24</option>
+            <option>25-30</option>
+            <option>31-35</option>
+            <option>36-40</option>
+            <option>40+</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="profession">Profession</label>
+          <select id="profession" required>
+            <option value="">Select</option>
+            <option>Student</option>
+            <option>Engineer</option>
+            <option>Doctor</option>
+            <option>Business</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="salary">Monthly Salary (BDT)</label>
+          <select id="salary" required>
+            <option value="">Select</option>
+            <option>&lt; 10,000</option>
+            <option>10,000 - 30,000</option>
+            <option>30,001 - 60,000</option>
+            <option>60,001 - 150,000</option>
+            <option>&gt; 150,000</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="education">Education</label>
+          <select id="education" required>
+            <option value="">Select</option>
+            <option>High School</option>
+            <option>Graduation</option>
+            <option>Post Grad</option>
+            <option>PhD</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="residence">Residence</label>
+          <select id="residence" required>
+            <option value="">Select</option>
+            <option>Parent's House</option>
+            <option>Rented</option>
+            <option>Owned</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="country">Country</label>
+          <select id="country" required>
+            <option value="Bangladesh" selected>Bangladesh</option>
+            <option>India</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label for="note">Any short note (optional)</label>
+          <input id="note" type="text" placeholder="Optional: a short message..." />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit">Calculate</button>
+        <button type="button" class="ghost" id="resetBtn">Reset</button>
+        <div style="margin-left:auto;color:var(--muted);font-size:13px">Inspired by Shaadi.org</div>
+      </div>
+
+      <div class="foot">
+        <strong>Note:</strong> This tool is intended to create awareness about the human cost of dowry (যৌতুক — <em>joutuk</em>). It does not compute a monetary price. :contentReference[oaicite:2]{index=2}
+      </div>
+
+      <div class="result" id="resultBox" aria-live="polite">
+        <div style="display:flex;align-items:center;gap:18px;justify-content:space-between;flex-wrap:wrap">
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Reported dowry-related deaths in Bangladesh</div>
+            <div class="big-number" id="deathCount">0</div>
+            <div class="message" id="resultMessage">—</div>
+          </div>
+          <div style="min-width:160px;text-align:right">
+            <small style="color:var(--muted);display:block;margin-bottom:8px">This figure is shown to shock and inform.</small>
+            <button id="learnBtn" type="button">Read the message</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+    <div class="final-note" id="finalNote" role="status" aria-live="polite">
+      <h2>Before calculating your worth, ask yourself — what is her life worth?</h2>
+      <p>Let's do away with Dowry. Be a part of the change now.</p>
+      <a class="cta" href="#" id="shareBtn">Share the idea</a>
+      <div style="margin-top:12px;font-size:13px;color:var(--muted)">
+        Sources: research on dowry in Bangladesh. :contentReference[oaicite:3]{index=3}
+      </div>
+    </div>
+
+    <footer>
+      <div>Sources & further reading:</div>
+      <ul style="margin:6px 0 0;padding-left:18px;color:var(--muted)">
+        <li><a class="source" href="https://shaadi.org/dowry-calculator/" target="_blank" rel="noopener">Shaadi.org — Dowry Calculator (inspiration)</a></li>
+        <li><a class="source" href="https://vc.bridgew.edu/cgi/viewcontent.cgi?article=1771&context=jiws" target="_blank" rel="noopener">A. Begum — Dowry in Bangladesh (research)</a></li>
+        <li><a class="source" href="https://en.banglapedia.org/index.php/Dowry" target="_blank" rel="noopener">Banglapedia — Dowry (context)</a></li>
+      </ul>
+    </footer>
+  </main>
+
+  <script>
+    (function(){
+      // Sourced number shown for awareness: a reported research figure.
+      // You can replace deathCountValue with another sourced number if you prefer.
+      const deathCountValue = 325; // research-reported example number for Bangladesh (awareness)
+      const form = document.getElementById('calcForm');
+      const resultBox = document.getElementById('resultBox');
+      const deathCountEl = document.getElementById('deathCount');
+      const resultMessage = document.getElementById('resultMessage');
+      const learnBtn = document.getElementById('learnBtn');
+      const finalNote = document.getElementById('finalNote');
+      const resetBtn = document.getElementById('resetBtn');
+      const shareBtn = document.getElementById('shareBtn');
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        // Quick validation (form fields are required in markup)
+        const age = document.getElementById('age').value;
+        const prof = document.getElementById('profession').value;
+        const sal = document.getElementById('salary').value;
+        const edu = document.getElementById('education').value;
+        const res = document.getElementById('residence').value;
+        const country = document.getElementById('country').value;
+
+        // Show the shock number
+        deathCountEl.textContent = deathCountValue.toLocaleString();
+        resultMessage.textContent = `This number represents reported dowry-related deaths in Bangladesh (from research/records) — shown to encourage reflection and change.`;
+        resultBox.style.display = 'block';
+
+        // smooth scroll the result into view
+        resultBox.scrollIntoView({behavior:'smooth', block:'center'});
+
+        // after a short delay, automatically reveal the final note when user clicks Learn
+      });
+
+      learnBtn.addEventListener('click', function(){
+        // Transition: fade out form content and show final note.
+        const app = document.getElementById('app');
+        // conceal form and result, show final note
+        form.style.display = 'none';
+        resultBox.style.display = 'none';
+        finalNote.style.display = 'block';
+        finalNote.scrollIntoView({behavior:'smooth', block:'center'});
+      });
+
+      resetBtn.addEventListener('click', function(){
+        form.reset();
+        resultBox.style.display = 'none';
+        finalNote.style.display = 'none';
+      });
+
+      shareBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        // attempt Web Share API; fallback copy text
+        const text = "Before calculating your worth, ask yourself what is her life worth? Let's do away with Dowry. Be a part of the change now.";
+        if(navigator.share){
+          navigator.share({title:'Dowry awareness', text}).catch(()=>{ alert('Share cancelled'); });
+        } else {
+          navigator.clipboard?.writeText(text).then(()=> alert('Message copied to clipboard — share it!'), ()=> alert('Copy failed — please share manually.'));
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
